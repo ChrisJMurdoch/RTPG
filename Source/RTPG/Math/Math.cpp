@@ -5,7 +5,7 @@
 
 int combineInts(int t1, int t2)
 {
-	return t1*12345 + t2;
+	return t1*1234567 + t2;
 }
 
 int Math::intHash(int t)
