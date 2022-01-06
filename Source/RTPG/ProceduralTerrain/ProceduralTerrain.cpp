@@ -7,58 +7,106 @@
 
 #include <cmath>
 
-AProceduralTerrain::AProceduralTerrain()
-{
 
+AProceduralTerrain::AProceduralTerrain() : Super()
+{
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void AProceduralTerrain::spawnChunk(FIntPoint location)
-{
-	UProceduralTerrainChunk *chunk = NewObject<UProceduralTerrainChunk>(this);
-	chunk->SetRelativeLocation( FVector(location.X, location.Y, 0) * chunkSize );
-	chunk->generate();
-	chunk->RegisterComponent();
-	meshes.Add(location, chunk);
-}
 
-void AProceduralTerrain::despawnChunk(FIntPoint location)
-{
+// ===== ===== ===== EVENTS ===== ===== =====
 
-}
 
-// Initially generate chunk meshes
+// Initial generation (Editor and Game)
 void AProceduralTerrain::PostRegisterAllComponents()
 {
-	FVector2D player(0, 0);
+	Super::PostRegisterAllComponents();
 
-	float const spawnRadius = 3;
-	int upperSpawnDiameter = std::round(spawnRadius)*2 + 1;
-	int lowerSpawnRadius = upperSpawnDiameter / 2;
+	chunksSpawned = 0;
+	chunksDespawned = 0;
 
-	FIntPoint offset( std::floor(player.X)-lowerSpawnRadius, std::floor(player.Y)-lowerSpawnRadius );
+	syncChunks( FVector2D(playerX, 0) );
+}
 
-	for (int x=0; x<upperSpawnDiameter; x++)
+// Generation properties change (Editor)
+void AProceduralTerrain::PostEditChangeProperty(FPropertyChangedEvent &event)
+{
+	Super::PostEditChangeProperty(event);
+
+	clearChunks();
+	syncChunks( FVector2D(playerX, 0) );
+}
+
+// Gameloop tick (Game)
+void AProceduralTerrain::Tick(float deltaSeconds)
+{
+	Super::Tick(deltaSeconds);
+
+	syncChunks( FVector2D(playerX, 0) );
+}
+
+
+// ===== ===== ===== HIGH-LEVEL OPERATIONS ===== ===== =====
+
+
+// Ensure correct chunks are loaded
+void AProceduralTerrain::syncChunks(FVector2D playerPosition)
+{
+	// Remove chunks out of range
+	for (TPair<FIntPoint, UProceduralTerrainChunk *> entry : meshes)
 	{
-		for (int y=0; y<upperSpawnDiameter; y++)
+		FVector2D chunkCentre(entry.Key.X+0.5f, entry.Key.Y+0.5f);
+		if ((chunkCentre-playerPosition).Size() > renderDistance)
 		{
-			FVector2D chunkCentre(offset.X+0.5+x, offset.Y+0.5+y);
-			if ((chunkCentre-player).Size()<=spawnRadius)
+			despawnChunk(entry.Key);
+		}
+	}
+
+	// Add chunks in range
+	int spawnDiameter=std::round(renderDistance)*2+1, spawnRadius=spawnDiameter/2;
+	int xOffset=std::floor(playerPosition.X)-spawnRadius, yOffset=std::floor(playerPosition.Y)-spawnRadius;
+	for (int x=xOffset; x<xOffset+spawnDiameter; x++)
+	{
+		for (int y=yOffset; y<yOffset+spawnDiameter; y++)
+		{
+			FVector2D chunkCentre(x+0.5, y+0.5);
+			if ( (chunkCentre-playerPosition).Size()<=renderDistance )
 			{
-				spawnChunk(FIntPoint(offset.X+x, offset.Y+y));
+				spawnChunk(FIntPoint(x, y));
 			}
 		}
 	}
 }
 
-// Trigger mesh regeneration when parameters change
-void AProceduralTerrain::PostEditChangeProperty(FPropertyChangedEvent &event)
+// Despawn all chunks
+void AProceduralTerrain::clearChunks()
 {
-	Super::PostEditChangeProperty(event);
-	// mesh->generate();
+	for (TPair<FIntPoint, UProceduralTerrainChunk *> entry : meshes)
+		despawnChunk(entry.Key);
 }
-void AProceduralTerrain::PostEditMove(bool bFinished)
+
+
+// ===== ===== ===== LOW-LEVEL OPERATIONS ===== ===== =====
+
+
+void AProceduralTerrain::spawnChunk(FIntPoint location)
 {
-	Super::PostEditMove(bFinished);
-	//if (bFinished || generateWhileMoving)
-		//mesh->generate(FString("PostEditMove"));
+	if (meshes.Contains(location))
+		return;
+	UProceduralTerrainChunk *chunk = NewObject<UProceduralTerrainChunk>(this);
+	chunk->SetRelativeLocation( FVector(location.X, location.Y, 0) * chunkSize );
+	chunk->generate();
+	chunk->RegisterComponent();
+	meshes.Add(location, chunk);
+	chunksSpawned++;
+}
+
+void AProceduralTerrain::despawnChunk(FIntPoint location)
+{
+	if (!meshes.Contains(location))
+		return;
+	meshes[location]->DestroyComponent();
+	meshes.Remove(location);
+	chunksDespawned++;
 }

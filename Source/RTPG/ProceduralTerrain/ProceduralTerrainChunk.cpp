@@ -5,7 +5,7 @@
 
 #include "../PerlinNoise/PerlinNoise.h"
 
-UProceduralTerrainChunk::UProceduralTerrainChunk(const FObjectInitializer &ObjectIn) : UProceduralMeshComponent(ObjectIn)
+UProceduralTerrainChunk::UProceduralTerrainChunk(FObjectInitializer const &ObjectIn) : UProceduralMeshComponent(ObjectIn)
 {
 	actor = static_cast<AProceduralTerrain *>(GetOwner());
 }
@@ -48,7 +48,7 @@ TArray<FVector> UProceduralTerrainChunk::generateVertices()
 		{
 			float yPos = float(y) / (actor->resolution-1);
 			FVector2D samplePos = (FVector2D(xPos, yPos) + chunkOffset) * actor->frequency;
-			float zPos = PerlinNoise::fBm(samplePos.X, samplePos.Y, actor->octaves, actor->seed) / actor->frequency;
+			float zPos = PerlinNoise::fBm(samplePos.X, samplePos.Y, actor->octaves) / actor->frequency;
 			vertices.Add(FVector(xPos, yPos, zPos) * actor->chunkSize);
 		}
 	}

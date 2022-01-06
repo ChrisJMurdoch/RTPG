@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-float PerlinNoise::sample(float x, float y, int seed)
+float PerlinNoise::sample(float x, float y)
 {
 	// Grid coordinates
 	int X=std::floor(x), Y=std::floor(y);
@@ -20,10 +20,10 @@ float PerlinNoise::sample(float x, float y, int seed)
 	FVector2D rTR = sample - FVector2D(1, 1);
 
 	// Generate pseudorandom vectors
-	FVector2D pBL = randomVector(X,   Y,   seed);
-	FVector2D pBR = randomVector(X+1, Y,   seed);
-	FVector2D pTL = randomVector(X,   Y+1, seed);
-	FVector2D pTR = randomVector(X+1, Y+1, seed);
+	FVector2D pBL = randomVector(X,   Y);
+	FVector2D pBR = randomVector(X+1, Y);
+	FVector2D pTL = randomVector(X,   Y+1);
+	FVector2D pTR = randomVector(X+1, Y+1);
 
 	// Calculate dot products
 	float dBL = FVector2D::DotProduct(pBL, rBL);
@@ -40,7 +40,7 @@ float PerlinNoise::sample(float x, float y, int seed)
 	return d;
 }
 
-float PerlinNoise::fBm(float x, float y, int octaves, int seed)
+float PerlinNoise::fBm(float x, float y, int octaves)
 {
 	static float const LACUNARITY=2, PERSISTANCE=0.41f;
 
@@ -48,7 +48,7 @@ float PerlinNoise::fBm(float x, float y, int octaves, int seed)
 	float frequency=1, amplitude=1;
 	for (int i=0; i<octaves; i++)
 	{
-		value += sample(x*frequency, y*frequency, seed) * amplitude;
+		value += sample(x*frequency, y*frequency) * amplitude;
 		max += amplitude;
 
 		frequency *= LACUNARITY;
@@ -58,9 +58,9 @@ float PerlinNoise::fBm(float x, float y, int octaves, int seed)
 	return value / max;
 }
 
-FVector2D PerlinNoise::randomVector(int X, int Y, int seed)
+FVector2D PerlinNoise::randomVector(int X, int Y)
 {
-	FVector2D vector( Math::intHash(X, Y, seed), Math::intHash(X, Y, seed+1) );
+	FVector2D vector( Math::intHash( Math::intCombine(X,Y) ), Math::intHash( Math::intCombine(X,Y)+1 ) );
 	vector.Normalize();
 	return vector;
 }

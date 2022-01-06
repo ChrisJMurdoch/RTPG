@@ -3,11 +3,6 @@
 
 #include <cmath>
 
-int combineInts(int t1, int t2)
-{
-	return t1*1234567 + t2;
-}
-
 int Math::intHash(int t)
 {
 	// Modified from: https://stackoverflow.com/a/12996028
@@ -18,14 +13,9 @@ int Math::intHash(int t)
 	return (t % (resolution+1)) - (resolution/2);
 }
 
-int Math::intHash(int t1, int t2)
+int Math::intCombine(int t1, int t2)
 {
-	return intHash( combineInts(t1, t2) );
-}
-
-int Math::intHash(int t1, int t2, int t3)
-{
-	return intHash( combineInts( t1, combineInts(t2, t3) ) );
+	return t1*1234567 + t2;
 }
 
 float Math::lerp(float a, float b, float t)

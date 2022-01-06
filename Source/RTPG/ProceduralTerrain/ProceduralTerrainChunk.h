@@ -20,7 +20,7 @@ public:
 	void generate();
 
 private:
-	UProceduralTerrainChunk(const FObjectInitializer &ObjectIn);
+	UProceduralTerrainChunk(FObjectInitializer const &ObjectIn);
 
 	TArray<FVector> generateVertices();
 	TArray<int32> generateIndices();
