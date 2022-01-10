@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ProceduralTerrainGenerator.h"
 #include "ProceduralTerrain.generated.h"
 
 class UProceduralTerrainChunk;
@@ -14,25 +15,29 @@ class RTPG_API AProceduralTerrain : public AActor
 
 private:
 	friend class UProceduralTerrainChunk;
+	friend class ProceduralTerrainGenerator;
 
-	UPROPERTY(EditAnywhere) float renderDistance = 2.5;
-	UPROPERTY(EditAnywhere) int frequency = 1;
+	UPROPERTY(EditAnywhere) int maxBlocksRegisteredPerTick = 1;
+	UPROPERTY(EditAnywhere) float renderDistance = 1;
+	UPROPERTY(EditAnywhere) float frequency = 1;
 	UPROPERTY(EditAnywhere) int chunkSize = 1000;
 	UPROPERTY(EditAnywhere) int octaves = 5;
-	UPROPERTY(EditAnywhere) int resolution = 25;
+	UPROPERTY(EditAnywhere) int resolution = 400;
 	UPROPERTY(EditAnywhere) UMaterialInterface *material;
 
 	UPROPERTY(VisibleAnywhere) FString debug;
 	UPROPERTY(VisibleAnywhere) float playerX = 0;
 	UPROPERTY(VisibleAnywhere) int chunksSpawned = 0;
 	UPROPERTY(VisibleAnywhere) int chunksDespawned = 0;
-	UPROPERTY(VisibleAnywhere) UProceduralTerrainChunk *mesh;
-	UPROPERTY(VisibleAnywhere) TMap<FIntPoint, UProceduralTerrainChunk *> meshes;
+	
+	TMap<FIntPoint, UProceduralTerrainChunk *> meshes{};
+	ProceduralTerrainGenerator generator;
+
+	int blocksRegisteredThisTick = 0;
 
 private:
 	AProceduralTerrain();
 
-	virtual void PostRegisterAllComponents();
 	virtual void PostEditChangeProperty(FPropertyChangedEvent &event);
 	virtual void Tick(float deltaSeconds);
 

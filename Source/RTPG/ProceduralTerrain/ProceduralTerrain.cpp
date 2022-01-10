@@ -2,32 +2,22 @@
 #include "ProceduralTerrain.h"
 
 #include "ProceduralTerrainChunk.h"
-
 #include "../PerlinNoise/PerlinNoise.h"
 
 #include <cmath>
 
 
-AProceduralTerrain::AProceduralTerrain() : Super()
+AProceduralTerrain::AProceduralTerrain() : Super(), generator()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+	chunksSpawned = 0;
+	chunksDespawned = 0;
 }
 
 
 // ===== ===== ===== EVENTS ===== ===== =====
 
-
-// Initial generation (Editor and Game)
-void AProceduralTerrain::PostRegisterAllComponents()
-{
-	Super::PostRegisterAllComponents();
-
-	chunksSpawned = 0;
-	chunksDespawned = 0;
-
-	syncChunks( FVector2D(playerX, 0) );
-}
 
 // Generation properties change (Editor)
 void AProceduralTerrain::PostEditChangeProperty(FPropertyChangedEvent &event)
@@ -35,7 +25,6 @@ void AProceduralTerrain::PostEditChangeProperty(FPropertyChangedEvent &event)
 	Super::PostEditChangeProperty(event);
 
 	clearChunks();
-	syncChunks( FVector2D(playerX, 0) );
 }
 
 // Gameloop tick (Game)
@@ -43,7 +32,18 @@ void AProceduralTerrain::Tick(float deltaSeconds)
 {
 	Super::Tick(deltaSeconds);
 
-	syncChunks( FVector2D(playerX, 0) );
+	blocksRegisteredThisTick = 0;
+
+	try {
+		syncChunks(FVector2D(playerX, 0));
+
+		for (TPair<FIntPoint, UProceduralTerrainChunk *> entry : meshes)
+			entry.Value->tick();
+	}
+	catch (std::exception const &e)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Tick Exception: %s"), e.what());
+	}
 }
 
 
@@ -96,9 +96,8 @@ void AProceduralTerrain::spawnChunk(FIntPoint location)
 		return;
 	UProceduralTerrainChunk *chunk = NewObject<UProceduralTerrainChunk>(this);
 	chunk->SetRelativeLocation( FVector(location.X, location.Y, 0) * chunkSize );
-	chunk->generate();
-	chunk->RegisterComponent();
 	meshes.Add(location, chunk);
+	chunk->init(generator);
 	chunksSpawned++;
 }
 
