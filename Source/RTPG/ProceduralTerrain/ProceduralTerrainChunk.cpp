@@ -9,6 +9,7 @@ UProceduralTerrainChunk::UProceduralTerrainChunk(FObjectInitializer const &Objec
 {
 	actor = static_cast<AProceduralTerrain *>(GetOwner());
 	bUseAsyncCooking = true;
+	bUseComplexAsSimpleCollision = true;
 }
 
 // Register with async generator
@@ -42,7 +43,7 @@ void UProceduralTerrainChunk::tick()
 		FDateTime start = FDateTime::Now();
 
 		// Create mesh
-		CreateMeshSection_LinearColor(0, meshData.vertices, meshData.indices, meshData.normals, meshData.uvs, meshData.colours, meshData.tangents, false);
+		CreateMeshSection_LinearColor(0, meshData.vertices, meshData.indices, meshData.normals, meshData.uvs, meshData.colours, meshData.tangents, true);
 		if (actor->material)
 			SetMaterial(0, actor->material);
 

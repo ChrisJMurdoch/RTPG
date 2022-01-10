@@ -18,11 +18,11 @@ private:
 	friend class ProceduralTerrainGenerator;
 
 	UPROPERTY(EditAnywhere) int maxBlocksRegisteredPerTick = 1;
-	UPROPERTY(EditAnywhere) float renderDistance = 1;
-	UPROPERTY(EditAnywhere) float frequency = 1;
-	UPROPERTY(EditAnywhere) int chunkSize = 1000;
-	UPROPERTY(EditAnywhere) int octaves = 5;
-	UPROPERTY(EditAnywhere) int resolution = 400;
+	UPROPERTY(EditAnywhere) float renderDistance = 10;
+	UPROPERTY(EditAnywhere) float frequency = 0.5;
+	UPROPERTY(EditAnywhere) int chunkSize = 500;
+	UPROPERTY(EditAnywhere) int octaves = 10;
+	UPROPERTY(EditAnywhere) int resolution = 75;
 	UPROPERTY(EditAnywhere) UMaterialInterface *material;
 
 	UPROPERTY(VisibleAnywhere) FString debug;
