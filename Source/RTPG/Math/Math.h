@@ -6,9 +6,9 @@
 class RTPG_API Math
 {
 public:
-	static int intHash(int t);
+	static uint32_t intHash(uint32_t t);
 
-	static int intCombine(int t1, int t2);
+	static uint32_t intCombine(uint16_t t1, uint16_t t2);
 
 	static float lerp(float a, float b, float t);
 

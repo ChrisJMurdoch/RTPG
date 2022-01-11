@@ -3,19 +3,20 @@
 
 #include <cmath>
 
-int Math::intHash(int t)
+// half_avalanche hashing function from https://burtleburtle.net/bob/hash/integer.html
+uint32_t Math::intHash(uint32_t a)
 {
-	// Modified from: https://stackoverflow.com/a/12996028
-	t = ((t >> 16) ^ t) * 0x45d9f3b;
-	t = ((t >> 16) ^ t) * 0x45d9f3b;
-	t = (t >> 16) ^ t;
-	static int const resolution = 1000;
-	return (t % (resolution+1)) - (resolution/2);
+    a = (a+0x479ab41d) + (a<<8);
+    a = (a^0xe4aa10ce) ^ (a>>5);
+    a = (a+0x9942f0a6) - (a<<14);
+    a = (a^0x5aedd67d) ^ (a>>3);
+    a = (a+0x17bea992) + (a<<7);
+    return a;
 }
 
-int Math::intCombine(int t1, int t2)
+uint32_t Math::intCombine(uint16_t t1, uint16_t t2)
 {
-	return t1*1234567 + t2;
+	return static_cast<uint32_t>(t1)<<16 | (t2);
 }
 
 float Math::lerp(float a, float b, float t)

@@ -8,7 +8,7 @@
 float PerlinNoise::sample(float x, float y)
 {
 	// Grid coordinates
-	int X=std::floor(x), Y=std::floor(y);
+	int16_t X=std::floor(x), Y=std::floor(y);
 
 	// Grid-relative sample coordinates
 	FVector2D sample(x-X, y-Y);
@@ -58,9 +58,17 @@ float PerlinNoise::fBm(float x, float y, int octaves)
 	return value / max;
 }
 
-FVector2D PerlinNoise::randomVector(int X, int Y)
+FVector2D PerlinNoise::randomVector(int16_t X, int16_t Y)
 {
-	FVector2D vector( Math::intHash( Math::intCombine(X,Y) ), Math::intHash( Math::intCombine(X,Y)+1 ) );
+	// Change to unsigned integers
+	uint16_t x=(1<<15)+X, y=(1<<15)+Y;
+
+	// Calculate hash of combined coordinates
+	uint32_t combined = (static_cast<uint32_t>(x)<<16) | (y);
+	int32_t h1=Math::intHash(combined), h2=Math::intHash(combined^0x11111111);
+
+	// Generate unit vector
+	FVector2D vector(h1, h2);
 	vector.Normalize();
 	return vector;
 }
