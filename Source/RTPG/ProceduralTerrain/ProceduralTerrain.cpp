@@ -34,10 +34,7 @@ void AProceduralTerrain::Tick(float deltaSeconds)
 
 	blocksRegisteredThisTick = 0;
 
-	// FVector playerPosition = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-	UWorld *world = GetWorld();
-	APlayerController *controller = world->GetFirstPlayerController();
-	APawn *pawn = controller->GetPawn();
+	APawn *pawn = GetWorld()->GetFirstPlayerController()->GetPawn();
 	FVector playerPosition = pawn ? pawn->GetActorLocation()/chunkSize : FVector(0.5, 0.5, 0);
 
 	try {
