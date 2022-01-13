@@ -19,10 +19,10 @@ private:
 
 	UPROPERTY(EditAnywhere) int maxBlocksRegisteredPerTick = 1;
 	UPROPERTY(EditAnywhere) float renderDistance = 10;
-	UPROPERTY(EditAnywhere) float frequency = 0.5;
-	UPROPERTY(EditAnywhere) int chunkSize = 500;
-	UPROPERTY(EditAnywhere) int octaves = 10;
-	UPROPERTY(EditAnywhere) int resolution = 75;
+	UPROPERTY(EditAnywhere) float frequency = 0.375;
+	UPROPERTY(EditAnywhere) int chunkSize = 2000;
+	UPROPERTY(EditAnywhere) int octaves = 12;
+	UPROPERTY(EditAnywhere) int resolution = 50;
 	UPROPERTY(EditAnywhere) UMaterialInterface *material;
 
 	UPROPERTY(VisibleAnywhere) FString debug;

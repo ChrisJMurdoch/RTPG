@@ -63,9 +63,14 @@ void AProceduralTerrain::syncChunks(FVector2D playerPosition)
 		}
 	}
 
-	// Add chunks in range
+	// Calculate range
 	int spawnDiameter=std::round(renderDistance)*2+1, spawnRadius=spawnDiameter/2;
 	int xOffset=std::floor(playerPosition.X)-spawnRadius, yOffset=std::floor(playerPosition.Y)-spawnRadius;
+
+	// Prioritise spawning chunk player is on
+	spawnChunk(FIntPoint(xOffset+spawnRadius, yOffset+spawnRadius));
+
+	// Queue the rest
 	for (int x=xOffset; x<xOffset+spawnDiameter; x++)
 	{
 		for (int y=yOffset; y<yOffset+spawnDiameter; y++)
