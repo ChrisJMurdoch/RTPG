@@ -34,8 +34,14 @@ void AProceduralTerrain::Tick(float deltaSeconds)
 
 	blocksRegisteredThisTick = 0;
 
+	// FVector playerPosition = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+	UWorld *world = GetWorld();
+	APlayerController *controller = world->GetFirstPlayerController();
+	APawn *pawn = controller->GetPawn();
+	FVector playerPosition = pawn ? pawn->GetActorLocation()/chunkSize : FVector(0.5, 0.5, 0);
+
 	try {
-		syncChunks(FVector2D(playerX, 0));
+		syncChunks(FVector2D(playerPosition.X, playerPosition.Y));
 
 		for (TPair<FIntPoint, UProceduralTerrainChunk *> entry : meshes)
 			entry.Value->tick();
