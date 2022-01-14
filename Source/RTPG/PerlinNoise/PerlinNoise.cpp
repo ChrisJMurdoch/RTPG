@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-float PerlinNoise::sample(float x, float y)
+float PerlinNoise::standard(float x, float y)
 {
 	// Grid coordinates
 	int16_t X=std::floor(x), Y=std::floor(y);
@@ -40,22 +40,14 @@ float PerlinNoise::sample(float x, float y)
 	return d;
 }
 
-float PerlinNoise::fBm(float x, float y, int octaves)
+float PerlinNoise::bubble(float x, float y)
 {
-	static float const LACUNARITY=2, PERSISTANCE=0.41f;
+	return abs( standard(x, y) )*2 - 1;
+}
 
-	float value=0, max=0;
-	float frequency=1, amplitude=1;
-	for (int i=0; i<octaves; i++)
-	{
-		value += sample(x*frequency, y*frequency) * amplitude;
-		max += amplitude;
-
-		frequency *= LACUNARITY;
-		amplitude *= PERSISTANCE;
-	}
-
-	return value / max;
+float PerlinNoise::ridge(float x, float y)
+{
+	return -bubble(x, y);
 }
 
 FVector2D PerlinNoise::randomVector(int16_t X, int16_t Y)

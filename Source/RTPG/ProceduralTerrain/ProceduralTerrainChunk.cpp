@@ -3,12 +3,12 @@
 
 #include "ProceduralTerrain.h"
 #include "ProceduralTerrainGenerator.h"
-#include "../PerlinNoise/PerlinNoise.h"
+#include "Biomes.h"
 
 UProceduralTerrainChunk::UProceduralTerrainChunk(FObjectInitializer const &ObjectIn) : UProceduralMeshComponent(ObjectIn), meshData()
 {
 	actor = static_cast<AProceduralTerrain *>(GetOwner());
-	bUseAsyncCooking = true;
+	bUseAsyncCooking = false;
 	bUseComplexAsSimpleCollision = true;
 }
 
@@ -76,7 +76,7 @@ void UProceduralTerrainChunk::generateVertices(FVector componentLocation, int re
 		{
 			float yPos = float(y) / (resolution-1);
 			FVector2D samplePos = (FVector2D(xPos, yPos) + chunkOffset) * frequency;
-			float zPos = PerlinNoise::fBm(samplePos.X, samplePos.Y, octaves) / frequency;
+			float zPos = Biomes::sample(samplePos.X, samplePos.Y, octaves) / frequency;
 			meshData.vertices.Add(FVector(xPos, yPos, zPos) * chunkSize);
 		}
 	}

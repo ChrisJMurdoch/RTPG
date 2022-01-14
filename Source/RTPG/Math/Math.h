@@ -13,4 +13,12 @@ public:
 	static float lerp(float a, float b, float t);
 
 	static float smootherstep(float t);
-};
+
+	static float kSigmoid(float x, float k);
+
+	static float fBm(float x, float y, float(&sampler)(float, float), int octaves);
+
+	static float sgn(float t);
+
+	static float usgn(float t);
+}; 
