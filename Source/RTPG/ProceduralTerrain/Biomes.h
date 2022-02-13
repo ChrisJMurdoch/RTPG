@@ -6,9 +6,11 @@
 class RTPG_API Biomes
 {
 public:
-	static float sample(float x, float y, int octaves);
+	static float height(float x, float y, int octaves);
+	static FLinearColor colour(float x, float y);
 
 private:
+	static float precipitation(float x, float y);
 	static float temperate(float x, float y, int octaves);
 	static float desert(float x, float y, int octaves);
 };

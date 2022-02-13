@@ -26,6 +26,7 @@ void UProceduralTerrainChunk::generate()
 	generateIndices(actor->resolution);
 	generateNormals();
 	generateUVs(actor->resolution);
+	generateColours(GetComponentLocation(), actor->resolution, actor->chunkSize, actor->frequency);
 
 	// Set ready flag
 	meshData.ready = true;
@@ -76,7 +77,7 @@ void UProceduralTerrainChunk::generateVertices(FVector componentLocation, int re
 		{
 			float yPos = float(y) / (resolution-1);
 			FVector2D samplePos = (FVector2D(xPos, yPos) + chunkOffset) * frequency;
-			float zPos = Biomes::sample(samplePos.X, samplePos.Y, octaves) / frequency;
+			float zPos = Biomes::height(samplePos.X, samplePos.Y, octaves) / frequency;
 			meshData.vertices.Add(FVector(xPos, yPos, zPos) * chunkSize);
 		}
 	}
@@ -144,7 +145,6 @@ void UProceduralTerrainChunk::generateUVs(int resolution)
 	meshData.uvs.Empty();
 	meshData.uvs.Reserve(resolution*resolution);
 
-	// Calculate height for each vertex
 	for (int x=0; x<resolution; x++)
 	{
 		float xPos = float(x) / (resolution-1);
@@ -152,6 +152,29 @@ void UProceduralTerrainChunk::generateUVs(int resolution)
 		{
 			float yPos = float(y) / (resolution-1);
 			meshData.uvs.Add(FVector2D(xPos, yPos));
+		}
+	}
+}
+
+// Generate colours for a mesh of a given size
+void UProceduralTerrainChunk::generateColours(FVector componentLocation, int resolution, float chunkSize, float frequency)
+{
+	// Init colours array
+	meshData.colours.Empty();
+	meshData.colours.Reserve(resolution*resolution);
+
+	// Offset in terms of number of chunks
+	FVector2D chunkOffset = FVector2D(componentLocation.X, componentLocation.Y) / chunkSize;
+
+	// Calculate colour for each vertex
+	for (int x=0; x<resolution; x++)
+	{
+		float xPos = float(x) / (resolution-1);
+		for (int y=0; y<resolution; y++)
+		{
+			float yPos = float(y) / (resolution-1);
+			FVector2D samplePos = (FVector2D(xPos, yPos) + chunkOffset) * frequency;
+			meshData.colours.Add(Biomes::colour(samplePos.X, samplePos.Y));
 		}
 	}
 }

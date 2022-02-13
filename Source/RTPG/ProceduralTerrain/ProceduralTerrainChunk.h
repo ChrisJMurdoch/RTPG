@@ -50,4 +50,5 @@ private:
 	void generateIndices(int resolution);
 	void generateNormals();
 	void generateUVs(int resolution);
+	void generateColours(FVector componentLocation, int resolution, float chunkSize, float frequency);
 };
