@@ -36,7 +36,7 @@ float Math::kSigmoid(float x, float k)
            ( -k + 2*k*abs(x) + 1 );
 }
 
-float Math::fBm(float x, float y, float(&sampler)(float, float), int octaves)
+float Math::fBm(float x, float y, float(&sampler)(float, float, int), int octaves, int seed)
 {
 	static float const LACUNARITY=2, PERSISTANCE=0.41f;
 
@@ -44,7 +44,7 @@ float Math::fBm(float x, float y, float(&sampler)(float, float), int octaves)
 	float frequency=1, amplitude=1;
 	for (int i=0; i<octaves; i++)
 	{
-		value += sampler(x*frequency, y*frequency) * amplitude;
+		value += sampler(x*frequency, y*frequency, seed) * amplitude;
 		max += amplitude;
 
 		frequency *= LACUNARITY;

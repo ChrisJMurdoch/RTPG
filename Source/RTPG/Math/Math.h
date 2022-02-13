@@ -16,7 +16,7 @@ public:
 
 	static float kSigmoid(float x, float k);
 
-	static float fBm(float x, float y, float(&sampler)(float, float), int octaves);
+	static float fBm(float x, float y, float(&sampler)(float, float, int), int octaves, int seed);
 
 	static float sgn(float t);
 
