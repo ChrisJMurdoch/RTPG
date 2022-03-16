@@ -7,10 +7,20 @@
 float Biomes::height(float x, float y, int octaves)
 {
 	// Interpolate different biomes
+	float precip = precipitation(x, y);
+	float heat = precipitation(x + 1000, y + 1000);
 	return Math::lerp(
-		desert(x, y, octaves) / 5,
-		temperate(x, y, octaves),
-		precipitation(x, y)
+		Math::lerp( // Cold biomes
+			temperate(x, y, octaves) / 2,
+			tundra(x, y, octaves),
+			precip
+		),
+		Math::lerp( // Hot biomes
+			desert(x, y, octaves) / 5,
+			marsh(x, y, octaves),
+			precip
+		),
+		heat
 	);
 }
 
@@ -25,8 +35,8 @@ FLinearColor Biomes::colour(float x, float y)
 float Biomes::precipitation(float x, float y)
 {
 	// Get biome interpolants
-	float const BLEND_SHARPNESS = 0.9f, // -1 : 1
-				BLEND_FREQ = 0.333;
+	float const BLEND_SHARPNESS = 0.96f, // -1 : 1
+				BLEND_FREQ = 0.2;
 	float precipitation = Math::fBm(x*BLEND_FREQ, y*BLEND_FREQ, PerlinNoise::standard, 2, 1);
 	precipitation = Math::kSigmoid(precipitation, BLEND_SHARPNESS);
 	precipitation = Math::usgn(precipitation);
@@ -36,6 +46,16 @@ float Biomes::precipitation(float x, float y)
 float Biomes::temperate(float x, float y, int octaves)
 {
 	return Math::fBm(x, y, PerlinNoise::standard, 10, 1);
+}
+
+float Biomes::tundra(float x, float y, int octaves)
+{
+	return Math::fBm(x, y, PerlinNoise::standard, 10, 1);
+}
+
+float Biomes::marsh(float x, float y, int octaves)
+{
+	return Math::fBm(x, y, PerlinNoise::bubble, 3, 1) / 5 + 0.1f;
 }
 
 float horizontalSineRidge(float y)
@@ -59,5 +79,5 @@ float Biomes::desert(float x, float y, int octaves)
 	float noise = Math::fBm(x*FREQ*1, y*FREQ*1, PerlinNoise::standard, 2, 1);
 	noise = Math::kSigmoid(noise, 0.75f);
 
-	return Math::lerp(frontOne, frontTwo, Math::usgn(noise)) - 3.0f;
+	return Math::lerp(frontOne, frontTwo, Math::usgn(noise)) - 0.0f;
 }
