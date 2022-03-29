@@ -3,9 +3,11 @@
 
 #include "ProceduralTerrainChunk.h"
 
-ProceduralTerrainGenerator::ProceduralTerrainGenerator()
+#include <string>
+
+ProceduralTerrainGenerator::ProceduralTerrainGenerator() : profiler(std::string("Idle"))
 {
-	UE_LOG(LogTemp, Warning, TEXT("[GAME] Thread starting..."));
+	// UE_LOG(LogTemp, Warning, TEXT("[GAME] Thread starting..."));
 	thread = FRunnableThread::Create(this, TEXT("ProceduralTerrainGeneratorThread"));
 }
 
@@ -20,13 +22,13 @@ ProceduralTerrainGenerator::~ProceduralTerrainGenerator()
 
 void ProceduralTerrainGenerator::asyncGenerate(UProceduralTerrainChunk *chunk)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[GAME] Chunk queued."));
+	// UE_LOG(LogTemp, Warning, TEXT("[GAME] Chunk queued."));
 	chunkQueue.Enqueue(chunk);
 }
 
 bool ProceduralTerrainGenerator::Init()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[WORKER] Thread started."));
+	// UE_LOG(LogTemp, Warning, TEXT("[WORKER] Thread started."));
 	return true;
 }
 
@@ -48,15 +50,17 @@ uint32 ProceduralTerrainGenerator::Run()
 		chunk->generate();
 
 		FDateTime end = FDateTime::Now();
-		UE_LOG(LogTemp, Warning, TEXT("[WORKER] Chunk dequeued. (%d ms)"), (end-start).GetFractionMilli());
+		profiler.switchTask(std::string("working"));
+		profiler.print();
+		// UE_LOG(LogTemp, Warning, TEXT("[WORKER] Chunk dequeued. (%d ms)"), (end-start).GetFractionMilli());
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[WORKER] Thread stopped."));
+	// UE_LOG(LogTemp, Warning, TEXT("[WORKER] Thread stopped."));
 	return 0;
 }
 
 void ProceduralTerrainGenerator::Stop()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[GAME] Thread stopping..."));
+	// UE_LOG(LogTemp, Warning, TEXT("[GAME] Thread stopping..."));
 	running = false;
 }
