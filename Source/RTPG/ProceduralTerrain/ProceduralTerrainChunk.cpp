@@ -3,6 +3,7 @@
 
 #include "ProceduralTerrain.h"
 #include "ProceduralTerrainGenerator.h"
+#include "Profiler.h"
 #include "Biomes.h"
 
 UProceduralTerrainChunk::UProceduralTerrainChunk(FObjectInitializer const &ObjectIn) : UProceduralMeshComponent(ObjectIn), meshData()
@@ -21,20 +22,30 @@ void UProceduralTerrainChunk::init(ProceduralTerrainGenerator &generator)
 // Worker thread - Generate mesh data
 void UProceduralTerrainChunk::generate()
 {
+	// Profile task
+	static Profiler workerProfiler(std::string("idle"));
+
 	// Generate mesh data
+	workerProfiler.switchTask(std::string("generating"));
 	generateVertices(GetComponentLocation(), actor->resolution, actor->chunkSize, actor->frequency, actor->octaves);
 	generateIndices(actor->resolution);
 	generateNormals();
 	generateUVs(actor->resolution);
 	generateColours(GetComponentLocation(), actor->resolution, actor->chunkSize, actor->frequency);
+	workerProfiler.switchTask(std::string("idle"));
 
 	// Set ready flag
 	meshData.ready = true;
+	UE_LOG(LogTemp, Warning, TEXT("[WORKER]: Profile:"));
+	workerProfiler.print();
 }
 
 // Game thread - Create and register mesh from generated data
 void UProceduralTerrainChunk::tick()
 {
+	// Profile task
+	static Profiler mainProfiler(std::string("starting"));
+
 	// Create mesh from data
 	if (meshData.ready && actor->blocksRegisteredThisTick < actor->maxBlocksRegisteredPerTick)
 	{
@@ -44,6 +55,7 @@ void UProceduralTerrainChunk::tick()
 		FDateTime start = FDateTime::Now();
 
 		// Create mesh
+		mainProfiler.switchTask(std::string("creating mesh"));
 		CreateMeshSection_LinearColor(0, meshData.vertices, meshData.indices, meshData.normals, meshData.uvs, meshData.colours, meshData.tangents, true);
 		if (actor->material)
 			SetMaterial(0, actor->material);
@@ -52,11 +64,17 @@ void UProceduralTerrainChunk::tick()
 		meshData.clearData();
 
 		// Register mesh
+		mainProfiler.switchTask(std::string("registering component"));
 		RegisterComponent();
 
 		FDateTime end = FDateTime::Now();
-		UE_LOG(LogTemp, Warning, TEXT("[GAME] Chunk registered. (%d ms)"), (end-start).GetFractionMilli());
+		// UE_LOG(LogTemp, Warning, TEXT("[GAME] Chunk registered. (%d ms)"), (end-start).GetFractionMilli());
+
+		UE_LOG(LogTemp, Warning, TEXT("[MAIN]: Profile:"));
+		mainProfiler.print();
 	}
+	
+	mainProfiler.switchTask(std::string("busy"));
 }
 
 // Generate vertices for a mesh of a given size

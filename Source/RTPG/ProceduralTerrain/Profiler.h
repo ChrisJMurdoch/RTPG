@@ -9,7 +9,7 @@
 class RTPG_API Profiler
 {
 private:
-	std::map<std::string, int> taskCount, taskNano;
+	std::map<std::string, float> taskCount, taskMilli;
 	FDateTime currentTaskStart;
 	std::string currentTaskName;
 

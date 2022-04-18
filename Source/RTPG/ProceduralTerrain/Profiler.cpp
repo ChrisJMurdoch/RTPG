@@ -1,7 +1,8 @@
 
 #include "Profiler.h"
+#include <iostream>
 
-Profiler::Profiler(std::string startingTaskName) : taskCount(), taskNano()
+Profiler::Profiler(std::string startingTaskName) : taskCount(), taskMilli()
 {
 	currentTaskName = startingTaskName;
 	currentTaskStart = FDateTime::Now();
@@ -19,12 +20,13 @@ void Profiler::switchTask(std::string taskName)
 		taskCount.emplace(currentTaskName, 1);
 	else
 		taskCount.at(currentTaskName)++;
+
 	FDateTime currentTime = FDateTime::Now();
-	int duration = (currentTime - currentTaskStart).GetFractionNano();
-	if (taskNano.count(currentTaskName) == 0)
-		taskNano.emplace(currentTaskName, duration);
+	float duration = (currentTime - currentTaskStart).GetFractionNano() / 1000000.0f;
+	if (taskMilli.count(currentTaskName) == 0.0f)
+		taskMilli.emplace(currentTaskName, duration);
 	else
-		taskNano.at(currentTaskName) += duration;
+		taskMilli.at(currentTaskName) += duration;
 
 	// Start new task
 	currentTaskName = taskName;
@@ -33,8 +35,21 @@ void Profiler::switchTask(std::string taskName)
 
 void Profiler::print() const
 {
-	for (auto const &p : taskCount)
+	// UE_LOG(LogTemp, Warning, TEXT("[PROFILER]:"));
+	for (std::pair<std::string const, float> const &pair : taskCount)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[PROFILER]: %s count: %d"), p.first.c_str(), p.second);
+		FString task(pair.first.c_str());
+		int count = pair.second;
+		float milli = taskMilli.at(pair.first);
+		UE_LOG(LogTemp, Warning, TEXT(" - Task '%s'(%d): avg. ms: %.2f"), *task, count, milli / count);
+
+		char const *name = "Chris";
+
+		// Printing a name in standard C++
+		std::cout << "Hello, " << name << std::endl;
+
+		// Printing a name in Unreal Engine
+		FString unrealString{name};
+		UE_LOG(LogTemp, Log, TEXT("Hello, %s"), *unrealString);
 	}
 }

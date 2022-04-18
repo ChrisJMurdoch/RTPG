@@ -3,15 +3,15 @@
 
 #include <cmath>
 
-// half_avalanche hashing function from https://burtleburtle.net/bob/hash/integer.html
+// Half-avalanche integer hashing function from https://burtleburtle.net/bob/hash/integer.html
 uint32_t Math::intHash(uint32_t a)
 {
-    a = (a+0x479ab41d) + (a<<8);
-    a = (a^0xe4aa10ce) ^ (a>>5);
-    a = (a+0x9942f0a6) - (a<<14);
-    a = (a^0x5aedd67d) ^ (a>>3);
-    a = (a+0x17bea992) + (a<<7);
-    return a;
+	a = (a+0x479ab41d) + (a<<8);
+	a = (a^0xe4aa10ce) ^ (a>>5);
+	a = (a+0x9942f0a6) - (a<<14);
+	a = (a^0x5aedd67d) ^ (a>>3);
+	a = (a+0x17bea992) + (a<<7);
+	return a;
 }
 
 uint32_t Math::intCombine(uint16_t t1, uint16_t t2)

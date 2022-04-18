@@ -5,7 +5,7 @@
 
 #include <string>
 
-ProceduralTerrainGenerator::ProceduralTerrainGenerator() : profiler(std::string("Idle"))
+ProceduralTerrainGenerator::ProceduralTerrainGenerator() : mainThreadProfiler(std::string("idle")), workerThreadProfiler(std::string("idle"))
 {
 	// UE_LOG(LogTemp, Warning, TEXT("[GAME] Thread starting..."));
 	thread = FRunnableThread::Create(this, TEXT("ProceduralTerrainGeneratorThread"));
@@ -50,8 +50,6 @@ uint32 ProceduralTerrainGenerator::Run()
 		chunk->generate();
 
 		FDateTime end = FDateTime::Now();
-		profiler.switchTask(std::string("working"));
-		profiler.print();
 		// UE_LOG(LogTemp, Warning, TEXT("[WORKER] Chunk dequeued. (%d ms)"), (end-start).GetFractionMilli());
 	}
 

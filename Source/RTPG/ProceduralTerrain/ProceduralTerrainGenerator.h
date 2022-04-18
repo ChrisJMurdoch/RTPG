@@ -2,7 +2,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "Profiler.h"
 
 class UProceduralTerrainChunk;
@@ -10,7 +9,7 @@ class UProceduralTerrainChunk;
 class RTPG_API ProceduralTerrainGenerator : public FRunnable
 {
 private:
-	Profiler profiler;
+	Profiler mainThreadProfiler, workerThreadProfiler;
 	volatile bool running = true;
 	FRunnableThread *thread{0};
 	TQueue<UProceduralTerrainChunk *> chunkQueue{};

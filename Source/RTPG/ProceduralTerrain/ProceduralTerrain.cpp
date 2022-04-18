@@ -61,9 +61,7 @@ void AProceduralTerrain::syncChunks(FVector2D playerPosition)
 	{
 		FVector2D chunkCentre(entry.Key.X+0.5f, entry.Key.Y+0.5f);
 		if ((chunkCentre-playerPosition).Size() > renderDistance)
-		{
 			despawnChunk(entry.Key);
-		}
 	}
 
 	// Calculate range
