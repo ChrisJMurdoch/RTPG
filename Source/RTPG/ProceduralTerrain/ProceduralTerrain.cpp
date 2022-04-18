@@ -22,7 +22,7 @@ AProceduralTerrain::AProceduralTerrain() : Super(), generator()
 // Generation properties change (Editor)
 void AProceduralTerrain::PostEditChangeProperty(FPropertyChangedEvent &event)
 {
-	Super::PostEditChangeProperty(event);
+	// Super::PostEditChangeProperty(event);
 
 	clearChunks();
 }
@@ -37,16 +37,16 @@ void AProceduralTerrain::Tick(float deltaSeconds)
 	APawn *pawn = GetWorld()->GetFirstPlayerController()->GetPawn();
 	FVector playerPosition = pawn ? pawn->GetActorLocation()/chunkSize : FVector(0.5, 0.5, 0);
 
-	try {
+	//try {
 		syncChunks(FVector2D(playerPosition.X, playerPosition.Y));
 
 		for (TPair<FIntPoint, UProceduralTerrainChunk *> entry : meshes)
 			entry.Value->tick();
-	}
-	catch (std::exception const &e)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Tick Exception: %s"), e.what());
-	}
+	//}
+	//catch (std::exception const &e)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Tick Exception: %s"), e.what());
+	//}
 }
 
 
